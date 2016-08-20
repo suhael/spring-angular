@@ -1,14 +1,16 @@
-angular.module('hello', [ 'ngRoute' ]).config(function($routeProvider) {
+angular.module('hello', [ 'ngRoute' ]).config(function($routeProvider, $httpProvider) {
 
 	$routeProvider.when('/', {
 		templateUrl : 'home.html',
 		controller : 'home',
-		controllerAs: 'controller'
+		controllerAs : 'controller'
 	}).when('/login', {
 		templateUrl : 'login.html',
 		controller : 'navigation',
-		controllerAs: 'controller'
+		controllerAs : 'controller'
 	}).otherwise('/');
+
+	$httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 }).controller('navigation',
 
@@ -20,9 +22,17 @@ function($rootScope, $http, $location, $route) {
 		return $route.current && route === $route.current.controller;
 	};
 
-	var authenticate = function(callback) {
+	var authenticate = function(credentials, callback) {
 
-		$http.get('user').then(function(response) {
+		var headers = credentials ? {
+			authorization : "Basic "
+					+ btoa(credentials.username + ":"
+							+ credentials.password)
+		} : {};
+
+		$http.get('user', {
+			headers : headers
+		}).then(function(response) {
 			if (response.data.name) {
 				$rootScope.authenticated = true;
 			} else {
@@ -40,29 +50,18 @@ function($rootScope, $http, $location, $route) {
 
 	self.credentials = {};
 	self.login = function() {
-		$http.post('login', $.param(self.credentials), {
-			headers : {
-				"content-type" : "application/x-www-form-urlencoded"
+		authenticate(self.credentials, function() {
+			if ($rootScope.authenticated) {
+				console.log("Login succeeded")
+				$location.path("/");
+				self.error = false;
+				$rootScope.authenticated = true;
+			} else {
+				console.log("Login failed")
+				$location.path("/login");
+				self.error = true;
+				$rootScope.authenticated = false;
 			}
-		}).then(function() {
-			authenticate(function() {
-				if ($rootScope.authenticated) {
-					console.log("Login succeeded")
-					$location.path("/");
-					self.error = false;
-					$rootScope.authenticated = true;
-				} else {
-					console.log("Login failed with redirect")
-					$location.path("/login");
-					self.error = true;
-					$rootScope.authenticated = false;
-				}
-			});
-		}, function() {
-			console.log("Login failed")
-			$location.path("/login");
-			self.error = true;
-			$rootScope.authenticated = false;
 		})
 	};
 
@@ -75,7 +74,15 @@ function($rootScope, $http, $location, $route) {
 
 }).controller('home', function($http) {
 	var self = this;
-	$http.get('http://localhost:9000').then(function(response) {
-		self.greeting = response.data;
+	$http.get('token').then(function(response) {
+		$http({
+			url : 'http://localhost:9000',
+			method : 'GET',
+			headers : {
+				'X-Auth-Token' : response.data.token
+			}
+		}).then(function(response) {
+			self.greeting = response.data;
+		});
 	})
 });
