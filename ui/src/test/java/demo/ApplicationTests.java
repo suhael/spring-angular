@@ -1,5 +1,8 @@
 package demo;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,9 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT)
 public class ApplicationTests {
@@ -23,7 +23,7 @@ public class ApplicationTests {
 
 	@Value("${security.oauth2.client.userAuthorizationUri}")
 	private String authorizeUri;
-	
+
 	private TestRestTemplate template = new TestRestTemplate();
 
 	@Test
@@ -38,6 +38,8 @@ public class ApplicationTests {
 		ResponseEntity<String> response = template.getForEntity("http://localhost:"
 				+ port + "/user", String.class);
 		assertEquals(HttpStatus.FOUND, response.getStatusCode());
+		assertEquals("http://localhost:" + port + "/login", response.getHeaders()
+				.getLocation().toString());
 	}
 
 	@Test
@@ -45,6 +47,8 @@ public class ApplicationTests {
 		ResponseEntity<String> response = template.getForEntity("http://localhost:"
 				+ port + "/resource", String.class);
 		assertEquals(HttpStatus.FOUND, response.getStatusCode());
+		assertEquals("http://localhost:" + port + "/login", response.getHeaders()
+				.getLocation().toString());
 	}
 
 	@Test
@@ -53,7 +57,7 @@ public class ApplicationTests {
 				+ port + "/login", String.class);
 		assertEquals(HttpStatus.FOUND, response.getStatusCode());
 		String location = response.getHeaders().getFirst("Location");
-		assertTrue("Wrong location: " + location , location.startsWith(authorizeUri));
+		assertTrue("Wrong location: " + location, location.startsWith(authorizeUri));
 	}
 
 }

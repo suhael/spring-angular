@@ -21,12 +21,14 @@ public class UiApplication extends WebSecurityConfigurerAdapter {
 	public void configure(HttpSecurity http) throws Exception {
 		// @formatter:off
 		http
+			.logout().and()
 			.authorizeRequests()
-				.antMatchers("/index.html", "/home.html", "/").permitAll()
+				.antMatchers("/index.html", "/home.html", "/", "/login").permitAll()
 				.anyRequest().authenticated()
 				.and()
 			.csrf()
 				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-		// @formatter:on
+			// @formatter:on
 	}
 }
+

@@ -29,7 +29,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="auth" target="1.7" />
-      <module name="resource" target="1.7" />
+      <module name="resource" target="1.5" />
       <module name="spring-angular" target="1.5" />
       <module name="ui" target="1.7" />
     </bytecodeTargetLevel>
