@@ -1,9 +1,11 @@
 security:
   user:
     password: password
-  ignored: /**/favicon.ico,/js/**,/css/**
-logging:
-  level:
-    org.springframework.security: DEBUG
 server:
   port: 8000
+zuul:
+  routes:
+    resource:
+      path: /resource/**
+      url: http://localhost:9000
+      sensitive-headers:
