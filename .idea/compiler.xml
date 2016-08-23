@@ -22,14 +22,16 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="admin" />
         <module name="auth" />
         <module name="resource" />
         <module name="ui" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="admin" target="1.7" />
       <module name="auth" target="1.7" />
-      <module name="resource" target="1.5" />
+      <module name="resource" target="1.7" />
       <module name="spring-angular" target="1.5" />
       <module name="ui" target="1.7" />
     </bytecodeTargetLevel>
